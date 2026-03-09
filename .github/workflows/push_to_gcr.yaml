@@ -1,0 +1,31 @@
+name: Push Docker Image to GHCR
+
+on:
+  workflow_run:
+    workflows: ["SonarCloud Analysis"]
+    types:
+      - completed
+
+jobs:
+  push-image:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/fastapi-app:latest -f src/Dockerfile .
+
+      - name: Push Docker Image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/fastapi-app:latest
