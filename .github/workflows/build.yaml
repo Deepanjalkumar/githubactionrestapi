@@ -1,9 +1,10 @@
-name: Docker Build and Test
+name: Docker Build and Run Test
 
 on:
   push:
     branches:
       - main
+
 
 jobs:
   docker-test:
@@ -14,27 +15,23 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker Image
-        run: |
-          docker build -t fastapi-image .
+        run: docker build -t fastapi-image -f src/Dockerfile .
 
       - name: Run Docker Container
-        run: |
-          docker run -d -p 8000:8000 --name fastapi_container fastapi-image
+        run: docker run -d -p 8000:8000 --name fastapi_container fastapi-image
 
-      - name: Show Running Containers
+      - name: List Running Containers
         run: docker ps
 
       - name: Check Container Status
         run: |
-          RUNNING=$(docker inspect -f '{{.State.Running}}' fastapi_container)
-          if [ "$RUNNING" != "true" ]; then
-            echo "Container failed to start"
+          if [ "$(docker inspect -f '{{.State.Running}}' fastapi_container)" != "true" ]; then
+            echo "Container is not running"
             exit 1
           fi
 
-      - name: Wait for API
+      - name: Wait for API to Start
         run: sleep 5
 
       - name: Test FastAPI Endpoint
-        run: |
-          curl -f http://localhost:8000 || exit 1
+        run: curl -f http://localhost:8000 || exit 1
