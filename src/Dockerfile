@@ -4,7 +4,7 @@ WORKDIR /githubactions
 
 COPY . /githubactions
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /githubactions/requirements.txt
 
 EXPOSE 8000
 
