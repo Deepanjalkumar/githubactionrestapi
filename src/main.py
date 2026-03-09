@@ -20,7 +20,7 @@ async def greetings(vendor:str):
     try:
         logging.info("[Info]: Got request from {}".format(vendor))
         return {
-            "message":"Greetings {}".format(vendor)
+            "message":"Greetings to {}".format(vendor)
         }
     except Exception as e:
         logging.error("[Error]: Got the error while processing request for vendor : {}".format(vendor))
